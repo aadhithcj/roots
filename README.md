@@ -38,11 +38,17 @@ The first request will be slow as waking up Render backend initially takes a few
 
 *UI Preview*
 
+### Screenshots
 
+![Showcase](<img width="1920" height="1080" alt="Image" src="https://github.com/user-attachments/assets/fd1e8014-e6d6-4887-8f11-77942582513c" />)
 
-![Roots Application Screenshot](https://i.imgur.com/your-screenshot-url.png)
+![Landing page](<img width="1920" height="1080" alt="Image" src="https://github.com/user-attachments/assets/395c067d-7ebd-48fe-88b0-8beebc0b66d0" />)
 
+**Weather and Soil Input**
+![Location](<img width="1920" height="1080" alt="Image" src="https://github.com/user-attachments/assets/54d412ad-a259-46bd-9540-c2d2814e4198" />)
 
+**Weather and Soil Input**
+![Values and prediction](<img width="1920" height="1080" alt="Image" src="https://github.com/user-attachments/assets/af6213a4-0878-4ed3-ae4a-520c5170783a" />)
 
 ---
 
