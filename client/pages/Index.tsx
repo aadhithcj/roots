@@ -95,6 +95,7 @@ export default function Index() {
 
 
   // --- API CONNECTION LOGIC ---
+  const API_BASE_URL = import.meta.env.VITE_API_URL;
   const fetchWeatherData = async (lat: number, lng: number) => {
     setIsLoadingWeather(true);
     setWeatherError(null);
@@ -103,7 +104,7 @@ export default function Index() {
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:5000/api/weather?lat=${lat}&lon=${lng}`
+        `${API_BASE_URL}/api/weather?lat=${lat}&lon=${lng}`
       );
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -156,7 +157,7 @@ export default function Index() {
 
     try {
         const response = await fetch(
-            `http://127.0.0.1:5000/api/soil?location=${encodeURIComponent(
+            `${API_BASE_URL}/api/soil?location=${encodeURIComponent(
                 selectedLocation.name
             )}`
         );
@@ -197,7 +198,7 @@ export default function Index() {
     console.log("Sending payload for recommendation:", payload);
 
     try {
-        const response = await fetch("http://127.0.0.1:5000/api/recommend", {
+        const response = await fetch(`${API_BASE_URL}/api/recommend`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload),
