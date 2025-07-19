@@ -35,11 +35,6 @@ The first request will be slow as waking up Render backend initially takes a few
 ## Screenshots
 
 
-
-*UI Preview*
-
-### Screenshots
-
 ![Showcase](Screenshots/Roots.png)
 
 ![Landing page](Screenshots/land.png)
