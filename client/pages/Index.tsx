@@ -48,7 +48,7 @@ interface LocationSuggestion {
   coordinates: { lat: number; lng: number };
 }
 
-// --- UI COMPONENTS (No changes needed) ---
+// --- UI COMPONENTS ---
 const AnimatedThermometer = () => ( <div className="relative w-8 h-8"> <Thermometer className="w-8 h-8 text-orange-400" /> <div className="absolute inset-0 animate-pulse bg-orange-400/20 rounded-full"></div> </div> );
 const AnimatedDroplets = () => ( <div className="relative w-8 h-8"> <Droplets className="w-8 h-8 text-blue-400" /> <div className="absolute top-0 left-1/2 transform -translate-x-1/2"> <div className="w-1 h-1 bg-blue-400 rounded-full animate-bounce delay-100"></div> </div> </div> );
 const AnimatedCloud = () => ( <div className="relative w-8 h-8"> <Cloud className="w-8 h-8 text-cyan-400" /> <div className="absolute inset-0 animate-pulse bg-cyan-400/10 rounded-full"></div> </div> );
@@ -94,9 +94,7 @@ export default function Index() {
   useEffect(() => { const hasSeenTutorial = localStorage.getItem("agro-scout-tutorial"); if (!hasSeenTutorial) { setShowTutorial(true); localStorage.setItem("agro-scout-tutorial", "true"); } const history = localStorage.getItem("agro-scout-history"); if (history) { setLocationHistory(JSON.parse(history)); } }, []);
 
 
-  // ===================================
-  // ## API CONNECTION LOGIC
-  // ===================================
+  // --- API CONNECTION LOGIC ---
   const fetchWeatherData = async (lat: number, lng: number) => {
     setIsLoadingWeather(true);
     setWeatherError(null);
@@ -126,7 +124,6 @@ export default function Index() {
     if (!searchQuery.trim()) return;
     console.log(`Searching for: ${searchQuery}`);
 
-    // Using a free geocoding API to get coordinates from a city name
     try {
         const geoResponse = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(searchQuery)}&count=1`);
         const geoData = await geoResponse.json();
@@ -202,9 +199,7 @@ export default function Index() {
     try {
         const response = await fetch("http://127.0.0.1:5000/api/recommend", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload),
         });
 
@@ -238,18 +233,12 @@ export default function Index() {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
-          setSelectedLocation({
-            lat: latitude,
-            lng: longitude,
-            name: "Current Location",
-          });
+          setSelectedLocation({ lat: latitude, lng: longitude, name: "Current Location" });
           setSearchQuery("Current Location");
           setCurrentStep(1);
           fetchWeatherData(latitude, longitude);
         },
-        (error) => {
-          console.error("Error getting location:", error);
-        },
+        (error) => console.error("Error getting location:", error),
       );
     }
   };
@@ -257,7 +246,6 @@ export default function Index() {
   const handleSoilInputChange = (field: keyof SoilData, value: string) => {
     setSoilData((prev) => ({ ...prev, [field]: value }));
   };
-
 
   return (
     <div className="min-h-screen bg-agro-dark relative">
@@ -268,35 +256,24 @@ export default function Index() {
 
       <header className="bg-card/50 backdrop-blur-xl border-b border-border sticky top-0 z-40">
         <div className="container mx-auto px-6 py-5">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-agro-green rounded-2xl flex items-center justify-center shadow-lg transform transition-transform hover:scale-105">
-                <MapPin className="w-7 h-7 text-agro-dark" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold text-foreground">
-                  Agro-Scout
-                </h1>
-                <p className="text-muted-foreground text-sm">
-                  AI-powered farming
-                </p>
-              </div>
+            <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 bg-agro-green rounded-2xl flex items-center justify-center shadow-lg transform transition-transform hover:scale-105">
+                        <MapPin className="w-7 h-7 text-agro-dark" />
+                    </div>
+                    <div>
+                        <h1 className="text-3xl font-bold text-foreground">Agro-Scout</h1>
+                        <p className="text-muted-foreground text-sm">AI-powered farming</p>
+                    </div>
+                </div>
+                <div className="flex items-center space-x-4">
+                    <Button variant="ghost" size="sm" onClick={() => setShowTutorial(true)} className="text-muted-foreground hover:text-agro-green">
+                        <Info className="w-4 h-4 mr-2" />
+                        Help
+                    </Button>
+                    <p className="text-muted-foreground hidden md:block font-medium">Smart crop recommendations for modern farming</p>
+                </div>
             </div>
-            <div className="flex items-center space-x-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowTutorial(true)}
-                className="text-muted-foreground hover:text-agro-green"
-              >
-                <Info className="w-4 h-4 mr-2" />
-                Help
-              </Button>
-              <p className="text-muted-foreground hidden md:block font-medium">
-                Smart crop recommendations for modern farming
-              </p>
-            </div>
-          </div>
         </div>
       </header>
 
@@ -326,33 +303,19 @@ export default function Index() {
                     className="h-14 text-lg border-border bg-secondary/50 focus:border-agro-green focus:ring-agro-green/20 focus:ring-4 rounded-3xl transition-all duration-300 focus:shadow-lg focus:shadow-agro-green/20"
                   />
                   {searchQuery && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setSearchQuery("")}
-                      className="absolute right-2 top-1/2 transform -translate-y-1/2 hover:bg-muted/50 rounded-full"
-                    >
+                    <Button variant="ghost" size="sm" onClick={() => setSearchQuery("")} className="absolute right-2 top-1/2 transform -translate-y-1/2 hover:bg-muted/50 rounded-full">
                       <X className="w-4 h-4" />
                     </Button>
                   )}
                 </div>
-                <Button
-                  onClick={handleSearch}
-                  disabled={!searchQuery.trim()}
-                  className="bg-agro-green hover:bg-agro-green-dark text-agro-dark px-8 h-14 text-lg font-semibold rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95"
-                >
+                <Button onClick={handleSearch} disabled={!searchQuery.trim()} className="bg-agro-green hover:bg-agro-green-dark text-agro-dark px-8 h-14 text-lg font-semibold rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95">
                   <Search className="w-5 h-5 mr-2" />
                   Search
                 </Button>
               </div>
 
               <div className="flex flex-wrap gap-3 mb-6">
-                <Button
-                  onClick={useCurrentLocation}
-                  variant="outline"
-                  size="sm"
-                  className="border-agro-green/50 text-agro-green hover:bg-agro-green hover:text-white rounded-3xl transform transition-all hover:scale-105"
-                >
+                <Button onClick={useCurrentLocation} variant="outline" size="sm" className="border-agro-green/50 text-agro-green hover:bg-agro-green hover:text-white rounded-3xl transform transition-all hover:scale-105">
                   <Navigation className="w-4 h-4 mr-2" />
                   Use Current Location
                 </Button>
@@ -360,20 +323,9 @@ export default function Index() {
                 {locationHistory.length > 0 && (
                   <div className="flex items-center space-x-2">
                     <Clock className="w-4 h-4 text-muted-foreground" />
-                    <span className="text-sm text-muted-foreground">
-                      Recent:
-                    </span>
+                    <span className="text-sm text-muted-foreground">Recent:</span>
                     {locationHistory.slice(0, 3).map((location, index) => (
-                      <Button
-                        key={index}
-                        onClick={() => {
-                          setSearchQuery(location);
-                          handleSearch();
-                        }}
-                        variant="ghost"
-                        size="sm"
-                        className="text-xs hover:bg-agro-green/10 hover:text-agro-green rounded-2xl"
-                      >
+                      <Button key={index} onClick={() => { setSearchQuery(location); handleSearch(); }} variant="ghost" size="sm" className="text-xs hover:bg-agro-green/10 hover:text-agro-green rounded-2xl">
                         {location}
                       </Button>
                     ))}
@@ -387,38 +339,16 @@ export default function Index() {
                 </p>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {locationSuggestions.map((suggestion, index) => (
-                    <button
-                      key={index}
-                      onClick={() => handleLocationSuggestionClick(suggestion)}
-                      className="p-3 text-left border border-border bg-secondary/30 hover:bg-secondary/50 rounded-2xl transition-all duration-300 hover:shadow-md hover:scale-105 group"
-                    >
-                      <div className="font-medium text-foreground group-hover:text-agro-green transition-colors">
-                        {suggestion.name}
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        {suggestion.region}
-                      </div>
+                    <button key={index} onClick={() => handleLocationSuggestionClick(suggestion)} className="p-3 text-left border border-border bg-secondary/30 hover:bg-secondary/50 rounded-2xl transition-all duration-300 hover:shadow-md hover:scale-105 group">
+                      <div className="font-medium text-foreground group-hover:text-agro-green transition-colors">{suggestion.name}</div>
+                      <div className="text-xs text-muted-foreground">{suggestion.region}</div>
                     </button>
                   ))}
                 </div>
               </div>
 
-              <div className="h-96 w-full bg-secondary/30 rounded-3xl flex items-center justify-center border-2 border-dashed border-agro-green/30 overflow-hidden relative group">
-                <div className="text-center relative z-10">
-                  <div className="w-20 h-20 bg-agro-green/20 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
-                    <MapPin className="w-10 h-10 text-agro-green" />
-                  </div>
-                  <p className="text-foreground font-semibold text-lg mb-2">
-                    Interactive Map
-                  </p>
-                  <p className="text-muted-foreground">
-                    {selectedLocation
-                      ? `Selected: ${selectedLocation.name || `${selectedLocation.lat.toFixed(4)}, ${selectedLocation.lng.toFixed(4)}`}`
-                      : "Click search to select a location"}
-                  </p>
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-br from-agro-green/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </div>
+              {/* ## MAP SECTION REMOVED ## */}
+
             </CardContent>
           </Card>
         </section>
@@ -430,21 +360,8 @@ export default function Index() {
             ) : weatherError ? (
               <Card className="border-red-500/20 bg-red-500/10 rounded-[40px]">
                 <CardContent className="p-6 flex items-center justify-between">
-                  <span className="text-red-400 font-medium">
-                    {weatherError}
-                  </span>
-                  <Button
-                    onClick={() =>
-                      selectedLocation &&
-                      fetchWeatherData(
-                        selectedLocation.lat,
-                        selectedLocation.lng,
-                      )
-                    }
-                    variant="outline"
-                    size="sm"
-                    className="border-red-500/30 text-red-400 hover:bg-red-500/20 rounded-3xl"
-                  >
+                  <span className="text-red-400 font-medium">{weatherError}</span>
+                  <Button onClick={() => selectedLocation && fetchWeatherData(selectedLocation.lat, selectedLocation.lng)} variant="outline" size="sm" className="border-red-500/30 text-red-400 hover:bg-red-500/20 rounded-3xl">
                     <RefreshCw className="w-4 h-4 mr-2" />
                     Retry
                   </Button>
@@ -455,43 +372,23 @@ export default function Index() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <Card className="shadow-xl border-border bg-card/50 backdrop-blur-sm hover:shadow-2xl transition-all duration-300 hover:scale-105 rounded-[40px]">
                     <CardContent className="p-8 text-center">
-                      <div className="w-16 h-16 bg-orange-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                        <AnimatedThermometer />
-                      </div>
-                      <h3 className="font-semibold text-foreground mb-2 text-lg">
-                        Temperature
-                      </h3>
-                      <p className="text-3xl font-bold text-orange-400">
-                        {weatherData.temperature}°C
-                      </p>
+                      <div className="w-16 h-16 bg-orange-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4"><AnimatedThermometer /></div>
+                      <h3 className="font-semibold text-foreground mb-2 text-lg">Temperature</h3>
+                      <p className="text-3xl font-bold text-orange-400">{weatherData.temperature}°C</p>
                     </CardContent>
                   </Card>
-
                   <Card className="shadow-xl border-border bg-card/50 backdrop-blur-sm hover:shadow-2xl transition-all duration-300 hover:scale-105 rounded-[40px]">
                     <CardContent className="p-8 text-center">
-                      <div className="w-16 h-16 bg-blue-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                        <AnimatedDroplets />
-                      </div>
-                      <h3 className="font-semibold text-foreground mb-2 text-lg">
-                        Humidity
-                      </h3>
-                      <p className="text-3xl font-bold text-blue-400">
-                        {weatherData.humidity}%
-                      </p>
+                      <div className="w-16 h-16 bg-blue-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4"><AnimatedDroplets /></div>
+                      <h3 className="font-semibold text-foreground mb-2 text-lg">Humidity</h3>
+                      <p className="text-3xl font-bold text-blue-400">{weatherData.humidity}%</p>
                     </CardContent>
                   </Card>
-
                   <Card className="shadow-xl border-border bg-card/50 backdrop-blur-sm hover:shadow-2xl transition-all duration-300 hover:scale-105 rounded-[40px]">
                     <CardContent className="p-8 text-center">
-                      <div className="w-16 h-16 bg-cyan-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                        <AnimatedCloud />
-                      </div>
-                      <h3 className="font-semibold text-foreground mb-2 text-lg">
-                        Rainfall
-                      </h3>
-                      <p className="text-3xl font-bold text-cyan-400">
-                        {weatherData.rainfall}mm
-                      </p>
+                      <div className="w-16 h-16 bg-cyan-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4"><AnimatedCloud /></div>
+                      <h3 className="font-semibold text-foreground mb-2 text-lg">Rainfall</h3>
+                      <p className="text-3xl font-bold text-cyan-400">{weatherData.rainfall}mm</p>
                     </CardContent>
                   </Card>
                 </div>
@@ -504,13 +401,8 @@ export default function Index() {
           <section className="animate-in fade-in-50 duration-700">
             <Card className="shadow-2xl border-border bg-card/50 backdrop-blur-sm rounded-[40px] transform transition-all duration-300 hover:shadow-3xl">
               <CardHeader className="bg-agro-green/10 border-b border-agro-green/20">
-                <CardTitle className="text-foreground text-xl">
-                  Soil Analysis
-                </CardTitle>
-                <p className="text-muted-foreground">
-                  Enter your soil nutrient levels for accurate crop
-                  recommendations
-                </p>
+                <CardTitle className="text-foreground text-xl">Soil Analysis</CardTitle>
+                <p className="text-muted-foreground">Enter your soil nutrient levels for accurate crop recommendations</p>
               </CardHeader>
               <CardContent className="p-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -525,59 +417,20 @@ export default function Index() {
                         {field.label}
                         <div className="relative ml-2">
                           <Info className="w-4 h-4 text-muted-foreground" />
-                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                            {field.info}
-                          </div>
+                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">{field.info}</div>
                         </div>
                       </label>
-                      <Input
-                        placeholder={field.placeholder}
-                        value={soilData[field.key as keyof SoilData]}
-                        onChange={(e) =>
-                          handleSoilInputChange(
-                            field.key as keyof SoilData,
-                            e.target.value,
-                          )
-                        }
-                        className="h-12 border-border bg-secondary/50 focus:border-agro-green focus:ring-agro-green/20 focus:ring-4 rounded-3xl transition-all duration-300 focus:shadow-lg"
-                        type="number"
-                      />
+                      <Input placeholder={field.placeholder} value={soilData[field.key as keyof SoilData]} onChange={(e) => handleSoilInputChange(field.key as keyof SoilData, e.target.value)} className="h-12 border-border bg-secondary/50 focus:border-agro-green focus:ring-agro-green/20 focus:ring-4 rounded-3xl transition-all duration-300 focus:shadow-lg" type="number" />
                     </div>
                   ))}
                 </div>
-
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <Button
-                    onClick={autoFetchSoilData}
-                    variant="outline"
-                    className="border-agro-green/50 text-agro-green hover:bg-agro-green hover:text-white h-12 px-6 rounded-3xl font-semibold transform transition-all hover:scale-105"
-                  >
+                  <Button onClick={autoFetchSoilData} variant="outline" className="border-agro-green/50 text-agro-green hover:bg-agro-green hover:text-white h-12 px-6 rounded-3xl font-semibold transform transition-all hover:scale-105">
                     <Zap className="w-4 h-4 mr-2" />
                     Auto-fetch soil data
                   </Button>
-
-                  <Button
-                    onClick={recommendCrops}
-                    disabled={
-                      isLoadingCrops ||
-                      !soilData.nitrogen ||
-                      !soilData.phosphorus ||
-                      !soilData.potassium ||
-                      !soilData.ph
-                    }
-                    className="bg-agro-green hover:bg-agro-green-dark text-agro-dark px-8 h-12 text-lg font-semibold flex-1 sm:flex-none rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95"
-                  >
-                    {isLoadingCrops ? (
-                      <>
-                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                        Analyzing...
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="w-5 h-5 mr-2" />
-                        Recommend Crops
-                      </>
-                    )}
+                  <Button onClick={recommendCrops} disabled={ isLoadingCrops || !soilData.nitrogen || !soilData.phosphorus || !soilData.potassium || !soilData.ph } className="bg-agro-green hover:bg-agro-green-dark text-agro-dark px-8 h-12 text-lg font-semibold flex-1 sm:flex-none rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95">
+                    {isLoadingCrops ? ( <> <Loader2 className="w-5 h-5 mr-2 animate-spin" /> Analyzing... </> ) : ( <> <Sparkles className="w-5 h-5 mr-2" /> Recommend Crops </> )}
                   </Button>
                 </div>
               </CardContent>
@@ -589,51 +442,26 @@ export default function Index() {
           <section className="animate-in fade-in-50 duration-900">
             <Card className="shadow-2xl border-border bg-card/50 backdrop-blur-sm rounded-[40px]">
               <CardHeader className="bg-agro-green/10 border-b border-agro-green/20">
-                <CardTitle className="text-foreground text-xl">
-                  Recommended Crops
-                </CardTitle>
-                <p className="text-muted-foreground">
-                  AI-powered recommendations based on your location, weather,
-                  and soil conditions
-                </p>
+                <CardTitle className="text-foreground text-xl">Recommended Crops</CardTitle>
+                <p className="text-muted-foreground">AI-powered recommendations based on your location, weather, and soil conditions</p>
               </CardHeader>
               <CardContent className="p-8">
                 <div className="space-y-6">
                   {cropRecommendations.map((crop, index) => (
-                    <div
-                      key={crop.name}
-                      className="flex items-center justify-between p-6 rounded-3xl border border-border bg-secondary/30 hover:bg-secondary/50 hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02] group"
-                    >
+                    <div key={crop.name} className="flex items-center justify-between p-6 rounded-3xl border border-border bg-secondary/30 hover:bg-secondary/50 hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02] group">
                       <div className="flex-1">
                         <div className="flex items-center space-x-4 mb-3">
-                          <h3 className="font-bold text-foreground text-lg group-hover:text-agro-green transition-colors">
-                            {crop.name}
-                          </h3>
-                          <Badge className="bg-agro-green/20 text-agro-green border-agro-green/30 px-3 py-1 rounded-full font-semibold">
-                            {crop.confidence}% match
-                          </Badge>
+                          <h3 className="font-bold text-foreground text-lg group-hover:text-agro-green transition-colors">{crop.name}</h3>
+                          <Badge className="bg-agro-green/20 text-agro-green border-agro-green/30 px-3 py-1 rounded-full font-semibold">{crop.confidence}% match</Badge>
                           <div className="flex items-center space-x-1 text-xs text-muted-foreground">
                             <BarChart3 className="w-3 h-3" />
-                            <span>
-                              Historical: {crop.historicalData.join("% → ")}%
-                            </span>
+                            <span>Historical: {crop.historicalData.join("% → ")}%</span>
                           </div>
                         </div>
-                        <p className="text-muted-foreground mb-4">
-                          {crop.description}
-                        </p>
-
-                        <ConfidenceMeter
-                          confidence={crop.confidence}
-                          trend={crop.trend}
-                        />
+                        <p className="text-muted-foreground mb-4">{crop.description}</p>
+                        <ConfidenceMeter confidence={crop.confidence} trend={crop.trend} />
                       </div>
-
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="ml-6 border-agro-green/50 text-agro-green hover:bg-agro-green hover:text-white rounded-3xl px-6 font-semibold transform transition-all hover:scale-105"
-                      >
+                      <Button variant="outline" size="sm" className="ml-6 border-agro-green/50 text-agro-green hover:bg-agro-green hover:text-white rounded-3xl px-6 font-semibold transform transition-all hover:scale-105">
                         Learn more
                       </Button>
                     </div>
