@@ -165,6 +165,10 @@ def get_rule_based_recommendations(features):
     return recommendations
 
 
+@app.route('/ping')
+def ping():
+    return 'OK', 200
+
 # --- API Routes (No changes needed) ---
 @app.route('/api/health', methods=['GET'])
 def health_check(): return jsonify({ 'status': 'healthy', 'model_loaded': model is not None, 'timestamp': datetime.now().isoformat() })
