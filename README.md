@@ -1,5 +1,5 @@
 # Roots: AI-Powered Crop Recommendation System
-
+**[🔗](rootssss.netlify.app/ )** 
 
 
 ---
@@ -20,13 +20,13 @@ To deliver these insights, the project is architected as a modern fullstack appl
 
 
 
-The frontend is a highly interactive and responsive single page application built with **React** and styled with **Tailwind CSS**. It provides a streamlined user experience, allowing users to get recommendations by searching for a location or using their device's geolocation. By integrating a robust machine learning model with live and historical environmental data services, Roots provides a practical and accessible tool for modern farming, aiming to help those in need of crop recommendations.
+The frontend is a highly interactive and responsive single page application built with **React** and styled with **Tailwind CSS**. It provides a streamlined user experience, allowing users to get recommendations by searching for a location or using their device's geolocation. Frontend is hosted on Netify and backend is hosted on Render. By integrating a robust machine learning model with live and historical environmental data services, Roots provides a practical and accessible tool for modern farming, aiming to help those in need of crop recommendations.
 
 
 
 ---
 
-
+## NB: The first request will be slow as waking up Render backend initially takes a few seconds.
 
 ## Screenshots
 
