@@ -28,7 +28,7 @@ The frontend is a highly interactive and responsive single page application buil
 
 ## Note
 
-: The first request will be slow as waking up Render backend initially takes a few seconds.
+The first request will be slow as waking up Render backend initially takes a few seconds.
 
 
 
