@@ -74,25 +74,6 @@ export default function Index() {
     }
   };
 
-  const autoFetchSoilData = async () => {
-    if (!selectedLocation) return;
-    setCurrentStep(2);
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/soil?lat=${selectedLocation.lat}&lon=${selectedLocation.lng}`);
-      if (!response.ok) throw new Error("Failed to fetch soil data.");
-      const data = await response.json();
-      setSoilData({
-          nitrogen: String(data.nitrogen || ""),
-          phosphorus: String(data.phosphorus || ""),
-          potassium: String(data.potassium || ""),
-          ph: String(data.ph || ""),
-      });
-      setCurrentStep(3);
-    } catch (error) {
-      alert("Could not auto-fetch soil data. Please enter values manually.");
-    }
-  };
-
   const recommendCrops = async () => {
     if (!selectedLocation || !weatherData) return;
     setIsLoadingCrops(true);
@@ -118,48 +99,32 @@ export default function Index() {
     fetchAndSetWeatherData(suggestion.coordinates.lat, suggestion.coordinates.lng);
   };
   
-  // In your index.tsx file, replace the old useCurrentLocation function with this one.
-
-const useCurrentLocation = () => {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      async (position) => { // Make the function async
-        const { latitude, longitude } = position.coords;
-        
-        try {
-          // --- NEW: Reverse Geocoding API Call ---
-          const geoResponse = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`);
-          const geoData = await geoResponse.json();
-          const locationName = geoData.city || geoData.locality || "Current Location";
-
-          // Set the state with the new location name
-          setSelectedLocation({
-            lat: latitude,
-            lng: longitude,
-            name: locationName,
-          });
-          setSearchQuery(locationName); // Use the real location name
-          
-          // Directly call the weather function with the coordinates
-          await fetchAndSetWeatherData(latitude, longitude);
-
-        } catch (error) {
-          console.error("Reverse geocoding failed:", error);
-          // Fallback if reverse geocoding fails
-          setSelectedLocation({ lat: latitude, lng: longitude, name: "Current Location" });
-          setSearchQuery("Current Location");
-          await fetchAndSetWeatherData(latitude, longitude);
+  const useCurrentLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          try {
+            const geoResponse = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`);
+            const geoData = await geoResponse.json();
+            const locationName = geoData.city || geoData.locality || "Current Location";
+            setSelectedLocation({ lat: latitude, lng: longitude, name: locationName });
+            setSearchQuery(locationName);
+            await fetchAndSetWeatherData(latitude, longitude);
+          } catch (error) {
+            setSelectedLocation({ lat: latitude, lng: longitude, name: "Current Location" });
+            setSearchQuery("Current Location");
+            await fetchAndSetWeatherData(latitude, longitude);
+          }
+        },
+        (error) => {
+          alert("Could not get your current location. Please enable location services.");
         }
-      },
-      (error) => {
-        console.error("Error getting location:", error);
-        alert("Could not get your current location. Please enable location services in your browser.");
-      }
-    );
-  } else {
-    alert("Geolocation is not supported by this browser.");
-  }
-};
+      );
+    } else {
+      alert("Geolocation is not supported by this browser.");
+    }
+  };
   
   const handleSoilInputChange = (field: keyof SoilData, value: string) => { 
     setSoilData((prev) => ({ ...prev, [field]: value })); 
@@ -271,11 +236,8 @@ const useCurrentLocation = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                   {[ { key: "nitrogen", label: "Nitrogen (N)", placeholder: "0-200", info: "Essential for leaf growth", }, { key: "phosphorus", label: "Phosphorus (P)", placeholder: "0-100", info: "Important for root development", }, { key: "potassium", label: "Potassium (K)", placeholder: "0-300", info: "Helps with disease resistance", }, { key: "ph", label: "pH Level", placeholder: "3.0-10.0", info: "Soil acidity/alkalinity", }, ].map((field) => ( <div key={field.key} className="space-y-3 group"> <label className="text-sm font-semibold text-foreground flex items-center"> {field.label} <div className="relative ml-2"> <Info className="w-4 h-4 text-muted-foreground" /> <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">{field.info}</div> </div> </label> <Input placeholder={field.placeholder} value={soilData[field.key as keyof SoilData]} onChange={(e) => handleSoilInputChange(field.key as keyof SoilData, e.target.value)} className="h-12 border-border bg-secondary/50 focus:border-agro-green focus:ring-agro-green/20 focus:ring-4 rounded-3xl transition-all duration-300 focus:shadow-lg" type="number" /> </div> ))}
                 </div>
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <Button onClick={autoFetchSoilData} variant="outline" className="border-agro-green/50 text-agro-green hover:bg-agro-green hover:text-white h-12 px-6 rounded-3xl font-semibold transform transition-all hover:scale-105">
-                    <Zap className="w-4 h-4 mr-2" /> Auto-fetch soil data
-                  </Button>
-                  <Button onClick={recommendCrops} disabled={ isLoadingCrops || !soilData.nitrogen || !soilData.phosphorus || !soilData.potassium || !soilData.ph } className="bg-agro-green hover:bg-agro-green-dark text-agro-dark px-8 h-12 text-lg font-semibold flex-1 sm:flex-none rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95">
+                <div className="flex justify-end">
+                  <Button onClick={recommendCrops} disabled={ isLoadingCrops || !soilData.nitrogen || !soilData.phosphorus || !soilData.potassium || !soilData.ph } className="bg-agro-green hover:bg-agro-green-dark text-agro-dark px-8 h-12 text-lg font-semibold rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 active:scale-95">
                     {isLoadingCrops ? ( <> <Loader2 className="w-5 h-5 mr-2 animate-spin" /> Analyzing... </> ) : ( <> <Sparkles className="w-5 h-5 mr-2" /> Recommend Crops </> )}
                   </Button>
                 </div>
@@ -303,9 +265,6 @@ const useCurrentLocation = () => {
                         <p className="text-muted-foreground mb-4">{crop.description}</p>
                         <ConfidenceMeter confidence={crop.confidence} trend={crop.trend} />
                       </div>
-                      <Button variant="outline" size="sm" className="ml-6 border-agro-green/50 text-agro-green hover:bg-agro-green hover:text-white rounded-3xl px-6 font-semibold transform transition-all hover:scale-105">
-                        Learn more
-                      </Button>
                     </div>
                   ))}
                 </div>
