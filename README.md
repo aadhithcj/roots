@@ -1,5 +1,5 @@
 # Roots: AI-Powered Crop Recommendation System
-**[🔗](rootssss.netlify.app/ )** 
+**[🔗 Roots](rootssss.netlify.app/ )** 
 
 
 ---
